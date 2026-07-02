@@ -4,12 +4,9 @@ import { useParams } from 'react-router-dom'
 import type { Task } from '../types'
 import type { DragEndEvent } from '@dnd-kit/core'
 import { DndContext, closestCenter } from '@dnd-kit/core'
-import {
-    SortableContext,
-    verticalListSortingStrategy,
-    useSortable,
-} from '@dnd-kit/sortable'
+import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import TaskModal from '../components/TaskModal'
 
 const columns = [
     { id: 'todo', title: 'To Do' },
@@ -17,13 +14,13 @@ const columns = [
     { id: 'done', title: 'Done' },
 ]
 
-function TaskCard({ task, onMove, onDelete }: { task: Task; onMove: (task: Task, status: string) => void; onDelete: (id: string) => void }) {
+function TaskCard({ task, onMove, onDelete, onOpen }: { task: Task; onMove: (task: Task, status: string) => void; onDelete: (id: string) => void; onOpen: (task: Task) => void }) {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: task.id })
     const style = { transform: CSS.Transform.toString(transform), transition }
 
     return (
         <div ref={setNodeRef} style={{ ...style, background: '#fff', padding: '12px', borderRadius: '6px', marginBottom: '8px', cursor: 'grab' }} {...attributes} {...listeners}>
-            <strong>{task.title}</strong>
+            <strong style={{ cursor: 'pointer', textDecoration: 'underline' }} onClick={() => onOpen(task)}>{task.title}</strong>
             <div style={{ fontSize: '12px', color: task.priority === 'high' ? 'red' : task.priority === 'medium' ? 'orange' : 'green' }}>
                 {task.priority === 'high' ? '🔴 Высокий' : task.priority === 'medium' ? '🟡 Средний' : '🟢 Низкий'}
             </div>
@@ -42,6 +39,7 @@ function Board() {
     const { tasks, addTask, deleteTask, updateTask } = useStore()
     const [search, setSearch] = useState('')
     const [priority, setPriority] = useState('')
+    const [selectedTask, setSelectedTask] = useState<Task | null>(null)
 
     const boardTasks = tasks.filter((t) => {
         const matchBoard = t.boardId === id
@@ -83,6 +81,7 @@ function Board() {
 
     return (
         <div style={{ padding: '40px' }}>
+            {selectedTask && <TaskModal task={selectedTask} onClose={() => setSelectedTask(null)} />}
             <h1>Доска</h1>
             <div style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
                 <input
@@ -114,7 +113,7 @@ function Board() {
                                 </button>
                                 <SortableContext items={colTasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
                                     {colTasks.map((task) => (
-                                        <TaskCard key={task.id} task={task} onMove={handleMove} onDelete={deleteTask} />
+                                        <TaskCard key={task.id} task={task} onMove={handleMove} onDelete={deleteTask} onOpen={setSelectedTask} />
                                     ))}
                                 </SortableContext>
                             </div>
