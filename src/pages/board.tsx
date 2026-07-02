@@ -81,7 +81,7 @@ function Board() {
 
     return (
         <div style={{ padding: '40px' }}>
-            {selectedTask && <TaskModal task={selectedTask} onClose={() => setSelectedTask(null)} />}
+            {selectedTask && <TaskModal task={selectedTask} onClose={() => setSelectedTask(null)} onSave={(updated) => { updateTask(updated); setSelectedTask(null) }} />}
             <h1>Доска</h1>
             <div style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
                 <input
