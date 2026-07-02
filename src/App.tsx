@@ -1,9 +1,14 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useState } from 'react'
 import Login from './pages/login'
 import Boards from './pages/boards'
 import Board from './pages/board'
 import Profile from './pages/profile'
+
+function PrivateRoute({ children }: { children: React.ReactNode }) {
+    const user = localStorage.getItem('user')
+    return user ? <>{children}</> : <Navigate to="/" />
+}
 
 function App() {
     const [dark, setDark] = useState(localStorage.getItem('theme') === 'dark')
@@ -28,9 +33,9 @@ function App() {
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<Login />} />
-                    <Route path="/boards" element={<Boards />} />
-                    <Route path="/board/:id" element={<Board />} />
-                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/boards" element={<PrivateRoute><Boards /></PrivateRoute>} />
+                    <Route path="/board/:id" element={<PrivateRoute><Board /></PrivateRoute>} />
+                    <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
                 </Routes>
             </BrowserRouter>
         </div>
