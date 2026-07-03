@@ -22,7 +22,13 @@ function TaskCard({ task, onMove, onDelete, onOpen }: { task: Task; onMove: (tas
 
     return (
         <div ref={setNodeRef} style={{ ...style, background: '#fff', padding: '14px', borderRadius: '10px', marginBottom: '10px', cursor: 'grab', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', borderLeft: '4px solid ' + priorityColor }} {...attributes} {...listeners}>
-            <strong style={{ cursor: 'pointer', color: '#4f46e5', fontSize: '15px' }} onClick={() => onOpen(task)}>{task.title}</strong>
+            <strong
+                style={{ cursor: 'pointer', color: '#4f46e5', fontSize: '15px' }}
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={() => onOpen(task)}
+            >
+                {task.title}
+            </strong>
             <div style={{ fontSize: '12px', color: priorityColor, marginTop: '4px', fontWeight: 'bold' }}>{priorityLabel}</div>
             {task.tags.length > 0 && (
                 <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '6px' }}>
@@ -37,7 +43,10 @@ function TaskCard({ task, onMove, onDelete, onOpen }: { task: Task; onMove: (tas
             {task.assignee && (
                 <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '2px' }}>👤 {task.assignee}</div>
             )}
-            <div style={{ marginTop: '8px', display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+            <div
+                style={{ marginTop: '8px', display: 'flex', gap: '4px', flexWrap: 'wrap' }}
+                onPointerDown={(e) => e.stopPropagation()}
+            >
                 {columns.filter((c) => c.id !== task.status).map((c) => (
                     <button key={c.id} onClick={() => onMove(task, c.id)} style={{ padding: '3px 8px', fontSize: '11px', borderRadius: '6px', border: '1px solid #e5e7eb', cursor: 'pointer', background: '#f9fafb' }}>{c.title}</button>
                 ))}
@@ -110,35 +119,19 @@ function Board() {
                     onChange={(e) => setSearch(e.target.value)}
                     style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #e5e7eb', width: '180px' }}
                 />
-                <select
-                    value={priority}
-                    onChange={(e) => setPriority(e.target.value)}
-                    style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #e5e7eb' }}
-                >
+                <select value={priority} onChange={(e) => setPriority(e.target.value)} style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
                     <option value="">Все приоритеты</option>
                     <option value="low">🟢 Низкий</option>
                     <option value="medium">🟡 Средний</option>
                     <option value="high">🔴 Высокий</option>
                 </select>
-                <select
-                    value={tagFilter}
-                    onChange={(e) => setTagFilter(e.target.value)}
-                    style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #e5e7eb' }}
-                >
+                <select value={tagFilter} onChange={(e) => setTagFilter(e.target.value)} style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
                     <option value="">Все теги</option>
-                    {allTags.map((tag) => (
-                        <option key={tag} value={tag}>{tag}</option>
-                    ))}
+                    {allTags.map((tag) => <option key={tag} value={tag}>{tag}</option>)}
                 </select>
-                <select
-                    value={assigneeFilter}
-                    onChange={(e) => setAssigneeFilter(e.target.value)}
-                    style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #e5e7eb' }}
-                >
+                <select value={assigneeFilter} onChange={(e) => setAssigneeFilter(e.target.value)} style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
                     <option value="">Все исполнители</option>
-                    {allAssignees.map((a) => (
-                        <option key={a} value={a}>{a}</option>
-                    ))}
+                    {allAssignees.map((a) => <option key={a} value={a}>{a}</option>)}
                 </select>
                 {(search || priority || tagFilter || assigneeFilter) && (
                     <button onClick={() => { setSearch(''); setPriority(''); setTagFilter(''); setAssigneeFilter('') }} style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #fee2e2', background: '#fff5f5', color: '#ef4444', cursor: 'pointer' }}>
